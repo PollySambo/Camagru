@@ -1,4 +1,5 @@
 <?php
+session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -21,13 +22,12 @@ try{
   $image_text = $_POST['image_text'];
 
   	// image file directory
-  	$target = "images/".basename($image);
+	  $target = "images/".basename($image);
+	  echo $username = $_SESSION['Username'];
 
-  	$sql = "INSERT INTO images (image, text) 
-		VALUES ('$image', '$image_text')";
+  	$sql = "INSERT INTO images (image, user, text) 
+		VALUES ('".$image."', '".$username."', '".$image_text."')";
 		$stmt = $con->prepare($sql);
-		$stmt->bindParam(':image', $image);
-		$stmt->bindParam(':image_text', $image_text);
 		$stmt->execute();
   	// execute query
 
@@ -48,6 +48,37 @@ catch(PDOException $e)
 {
 	echo "connection failed: " . $e->getMessage();
 }
+
+//------------------------------like button-----------------------------
+		
+	$con = new PDO("mysql:host=$DB_DSN;dbname=$DB_NAME", $DB_USER, $DB_PASSWORD);
+	$con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	  
+	$con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	
+	$stmt = $con->query("SELECT images.image_id, images.image FROM images");
+		
+	while($result = $stmt->fetchAll(PDO::FETCH_ASSOC))
+	{
+		$im[] = $result;
+	}
+
+		// //   print_r($result);
+		// foreach($result as $d)
+		//  {
+		 	//print_r($d);
+		/// 	echo "|".$d['image_id'];
+		//   foreach($d as $f)
+		//  §	{
+	//  echo $f['image_id'];
+	 // 		}
+	 // 	}
+	//  die();
+	// 	  while ($row == $result){
+	// 	 	  $img[] = $row;
+	// 	 }
+		  
+		//   echo '<pre>'; print_r($img);echo '</pre>';
 ?>
 
 <!DOCTYPE html>
@@ -57,13 +88,13 @@ catch(PDOException $e)
 		<link href="style.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>
-	<header>
+	<header style="display: flex;">
     <div class="logo-signup">
         <img src="pictures/logo.png">
         </div>
         <ul class="signup-nav">
 			<li><a href="index.php">HOME</a></li>
-			<li><a href="gallery.php">CAMERA</a></li>
+			<li><a href="cam.php">CAMERA</a></li>
 			<li><a href="logout.php">LOGOUT</a></li>
         </ul>
     </header>
@@ -81,14 +112,27 @@ catch(PDOException $e)
 	$row = $result;
 	//print_r($row);
 	
-	foreach ($result as $img) {
-		echo "<div id='img_div'>";
-      	echo "<img src='images/".$img['image']."' >";
-      	echo "<p>".$img['text']."</p>";
-      	echo "</div>";
-	}
-  ?>
-  <form method="POST" action="gallery.php" enctype="multipart/form-data">
+	foreach ($result as $img):
+		?>
+		<div id='img_div'>
+      	<img src='images/<?=$img['image'];?>' >
+      	<p><?=$img['text'];?></p>
+		  </div>
+	
+		  <?php
+		  endforeach;?>
+
+
+
+	<?php foreach ($im as $pic):?>
+		  <div class="pic">
+			  	<h3><?php echo $pic['user'];?></h3>
+				<a href="like.php?type=image&image_id=<?php echo $pic['image_id']; ?>">LIKE</a>
+		</div>
+	<?php endforeach;?>
+
+
+  <form method="POST" action="gallery.php" enctype="multipart/form-data" >
   	<input type="hidden" name="size" value="1000000">
   	<div>
   	  <input type="file" name="image">

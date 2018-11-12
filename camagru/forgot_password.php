@@ -11,7 +11,7 @@
     </div>
     </header>
     <div class="us" align="center">
-    <form class="box" action="reset.php" method="post">
+    <form class="box" action="login.php" method="post">
         <h1 align="center">*RESET*</h1>
         <input type="text" placeholder="email" name='email'>
         <input type="submit" name="" value="submit">

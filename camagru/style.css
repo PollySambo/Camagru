@@ -349,3 +349,17 @@ img{
     width: 300px;
     height: 140px;
 }*/
+.gall input[type = "submit"]{
+    border: 0;
+    background: none;
+    display: block;
+    margin: 20px auto;
+    text-align: center;
+    border: 2px solid #2e1114;
+    padding: 14px 40px;
+    outline: none;
+    color: #501b1d;
+    border-radius: 24px;
+    transition: 0.25s;
+    cursor: pointer;
+}

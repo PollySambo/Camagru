@@ -1,3 +1,13 @@
+
+<?php
+session_start();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+require_once 'config/database.php';
+ echo $_SESSION['Username'];
+?>
 <!doctype html>
 <html>
     <head>
@@ -11,8 +21,8 @@
                 <ul class="main-nav">
                     <li class="active"><a href=""> HOME </a></li>
                     <li><a href="logout.php"> LOGOUT </a></li>
-                    <li><a href="gallery.php"> CAMERA </a></li>
-                    <li><a href="camera.php"> GALLERY </a></li>
+                    <li><a href="gallery.php"> GALLERY </a></li>
+                    <li><a href="cam.php"> CAMERA </a></li>
                 </ul>
         </header>
         <h1 class="hero">ARE YOU READY</h1>

@@ -1,48 +1,87 @@
 <?php
-/* ini_set('display_errors', 1);
+session_start();
+ ini_set('display_errors', 1);
  ini_set('display_startup_errors', 1);
  error_reporting(E_ALL);
-*/
-require 'config/database.php';
+
+include 'config/database.php'; 
+require_once 'functions.php';
 //var_dump($servername);
-$errors = array();
+
+$fname;
+$lname;
+$username; 
+$email;
+$pwd;
+$re_pwd;
+$active;
+$notifi;
+$token;
+
+if (isset($_POST))
+{
+    $fname          = trim(htmlspecialchars($_POST['fname']));
+    $lname          = trim(htmlspecialchars($_POST['lname']));
+    $username       = trim(htmlspecialchars($_POST['username']));
+    $email          = trim(htmlspecialchars($_POST['email']));
+    $pwd            = trim(htmlspecialchars($_POST['pwd']));
+    $re_pwd         = trim(htmlspecialchars($_POST['re_pwd']));
+    $active         = false;
+    $notifi         = true;
+    $token			= bin2hex(openssl_random_pseudo_bytes(16));
+}
+//var_dump($fname, $lname, $username , $email, $pwd , $re_pwd, $active, $token);
 try {
-    $conn = new PDO("mysql:host=$DB_DSN;dbname=$DB_NAME", $DB_USER, $DB_PASSWORD);
-    // set the PDO error mode to exception
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    if ($_POST['signup']){
-
-        $fname = $_POST['fname'];
-        $lname = $_POST['lname'];
-        $username = $_POST['username'];
-        $email = $_POST['email'];
-        $pwd = $_POST['pwd'];
-        $re_pwd =  $_POST['re_pwd'];
-
-
-        echo "hello-".$_POST['fname']."-";
-
-        if ((isset($fname) && !empty($fname))
-        && (isset($lname) && !empty($lname)) 
-        && (isset($username) && !empty($username))
-        && (isset($email) && !empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL))
-        && (isset($pwd) && !empty($pwd) && isset($re_pwd) && !empty($re_pwd) && $re_pwd === $pwd))
-        {
-            $token = bin2hex(openssl_random_pseudo_bytes(16)); 
-            $hashpass = password_hash($pwd, PASSWORD_DEFAULT);
-            //var_dump($_POST);
-
-            if (count($errors) == 0) 
+        //print_r($_POST);
+       
+		if (!isset($username) || empty($username) || strlen($username) < 4)
+		{
+			echo "! Username input is invalid - *also check to see if username is more than 4 characters long<br>";
+		}
+		else if (!isset($email) || empty($email) || !(filter_var($email, FILTER_VALIDATE_EMAIL)))
+		{
+			echo "! Email input is invalid<br>";
+		}
+		else if (!isset($pwd) || empty($pwd) || !($pwd === $re_pwd) || !(strlen($pwd) > 6) || (!preg_match('/(?=.*[a-z])(?=.*[0-9]).{6,}/i', $pwd)))
+		{
+			echo "! Password input is invalid<br>";
+			if (!($pwd === $re_pwd))
+			{
+				echo "! Password fields do not match<br>";
+			}
+			if (!(strlen($pwd) > 6))
+			{
+				echo "! Password length is too short, must be atleast 6 characters long<br>";
+			}
+			if (!preg_match('/(?=.*[a-z])(?=.*[0-9]).{6,}/i', $pwd))
+			{
+				echo "! Password must contain letters and digits<br>";
+			}
+        }
+        else if ((isset($username) && !empty($username) && !(strlen($username) < 4)) 
+			&& (isset($email) && !empty($email) && (filter_var($email, FILTER_VALIDATE_EMAIL))) 
+			&& (isset($pwd) && !empty($pwd) && ($pwd === $re_pwd) && (strlen($pwd) > 6) || (preg_match('/(?=.*[a-z])(?=.*[0-9]).{6,}/i', $pwd))))
+		{
+            $con = new PDO("mysql:host=$DB_DSN;dbname=$DB_NAME", $DB_USER, $DB_PASSWORD);
+			$con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+            $user = checkExist($username, $email, $con);
+            if (!$user)
             {
-                $sql = "INSERT INTO users (firstname, lastname, Username, email, Passwrd, token)
-                VALUES (:fname, :lname, :username, :email, :pwd, :token)";
-                $stmt = $conn->prepare($sql);
+                $hashpass = password_hash($pwd, PASSWORD_BCRYPT);
+				$con = new PDO("mysql:host=$DB_DSN;dbname=$DB_NAME", $DB_USER, $DB_PASSWORD);
+				$con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+				$sql = "USE ".$DB_NAME;
+                $sql = "INSERT INTO users (firstname, lastname, Username, email, Passwrd, token, active, notifications)
+                VALUES (:fname, :lname, :username, :email, :pwd, :token, :activated, :notifications)";
+                $stmt = $con->prepare($sql);
                 $stmt->bindParam(':fname', $fname);
                 $stmt->bindParam(':lname', $lname);
                 $stmt->bindParam(':username', $username);
                 $stmt->bindParam(':email', $email);
                 $stmt->bindParam(':pwd', $hashpass);
                 $stmt->bindParam(':token', $token);
+                $stmt->bindParam(':activated', $active, PDO::PARAM_BOOL);
+                $stmt->bindParam(':notifications', $notifi , PDO::PARAM_BOOL);
                 $stmt->execute();
                 
                             $message ="
@@ -50,7 +89,6 @@ Thank you for registering with camagru.
 You can log in using the following credentals after verification:
 -------------------
 USERNAME :".$username."
-PASSWORD :".$password."
 -------------------
 please verify your account by clicking the link below
 http://127.0.0.1:8080/camagru/verify.php?email=$email&token=$token
@@ -62,18 +100,23 @@ camagru Team";
                 if (mail($email,$subject,$message))
                 {
                     $msg = "Mail sent OK";
+                    echo "<script>alert('signed up');</script>";
                 }
-                $conn = null;
+                else
+                    die('email failed to send');
             }
+            else
+                die('Username/Email Already Exists');
         }
-    }
-    //echo "Connected successfully";
- 
-    }
-    catch(PDOException $e)
-    {
-    echo "Connection failed: " . $e->getMessage();
-    }
+        else
+            die('something went wrong');
+                $conn = null;
+        }
+        catch(PDOException $e)
+        {
+            echo $stmt . "<br>" . $e->getMessage();
+        }
+        $conn = null;
 ?>
 
 <!doctype <!DOCTYPE html>
