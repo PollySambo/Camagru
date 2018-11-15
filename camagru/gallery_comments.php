@@ -30,7 +30,7 @@ if (isset($_GET['commet_txt'], $_GET['image_id']))
        
 }
 
-header('location:pizza.php');
+header('location:gallery.php');
 
 
 ?>

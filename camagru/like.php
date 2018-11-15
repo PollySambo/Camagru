@@ -39,5 +39,5 @@ if (isset($_GET['type'], $_GET['image_id']))
     }
 }
 
-header('location:pizza.php');
+header('location:gallery.php');
 ?>

@@ -25,9 +25,7 @@ try {
 
     // sql to create table
     $sql = "CREATE TABLE IF NOT EXISTS users (
-    `user_id` INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
-    firstname VARCHAR(30) NOT NULL,
-    lastname VARCHAR(30) NOT NULL,
+    `user_id` INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     Username VARCHAR(255) NOT NULL,
     email VARCHAR(255),
     Passwrd VARCHAR(255) NOT NULL,

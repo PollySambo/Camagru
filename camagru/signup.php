@@ -10,10 +10,10 @@ require_once 'functions.php';
 //var_dump($fname, $lname, $username , $email, $pwd , $re_pwd, $active, $token);
 try {
         //print_r($_POST);
-        if (!empty($_POST['fname'])  || !empty($_POST['lname']) || !empty($_POST['username']) || !empty($_POST['email']) || !empty($_POST['pwd']) || !empty($_POST['re_pwd']))
+        if (!empty($_POST['username']) || !empty($_POST['email']) || !empty($_POST['pwd']) || !empty($_POST['re_pwd']))
 {
-    $fname          = trim(htmlspecialchars($_POST['fname']));
-    $lname          = trim(htmlspecialchars($_POST['lname']));
+    // $fname          = trim(htmlspecialchars($_POST['fname']));
+    // $lname          = trim(htmlspecialchars($_POST['lname']));
     $username       = trim(htmlspecialchars($_POST['username']));
     $email          = trim(htmlspecialchars($_POST['email']));
     $pwd            = trim(htmlspecialchars($_POST['pwd']));
@@ -59,11 +59,11 @@ try {
 				$con = new PDO("mysql:host=$DB_DSN;dbname=$DB_NAME", $DB_USER, $DB_PASSWORD);
 				$con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 				$sql = "USE ".$DB_NAME;
-                $sql = "INSERT INTO users (firstname, lastname, Username, email, Passwrd, token, active, notifications)
-                VALUES (:fname, :lname, :username, :email, :pwd, :token, :activated, :notifications)";
+                $sql = "INSERT INTO users ( Username, email, Passwrd, token, active, notifications)
+                VALUES (:username, :email, :pwd, :token, :activated, :notifications)";
                 $stmt = $con->prepare($sql);
-                $stmt->bindParam(':fname', $fname);
-                $stmt->bindParam(':lname', $lname);
+                // $stmt->bindParam(':fname', $fname);
+                // $stmt->bindParam(':lname', $lname);
                 $stmt->bindParam(':username', $username);
                 $stmt->bindParam(':email', $email);
                 $stmt->bindParam(':pwd', $hashpass);
@@ -89,6 +89,7 @@ camagru Team";
                 {
                     $msg = "Mail sent OK";
                     echo "<script>alert('signed up');</script>";
+                    header('location:login.php');
                 }
                 else
                     die('email failed to send');
@@ -129,8 +130,8 @@ camagru Team";
     </header>
     <form class="box2" action="signup.php" method="post">
         <h1>Sign Up</h1>
-        <input type="text" placeholder=" First Name" name="fname" required>
-        <input type="text" placeholder="Last Name" name="lname" required>
+        <!-- <input type="text" placeholder=" First Name" name="fname" required>
+        <input type="text" placeholder="Last Name" name="lname" required> -->
         <input type="text" placeholder="Username" name="username" required>
         <input type="email" placeholder="Email Address" name="email" required>
         <input type="password" placeholder="Password" name="pwd" required>

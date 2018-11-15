@@ -12,8 +12,7 @@ try
 		if (!empty($_POST['Username']) || !empty($_POST['Password']))
 		{
 			$Username = htmlspecialchars($_POST['Username']);
-			$Password = htmlspecialchars(isset($_POST['Password']));
-
+			$Password = htmlspecialchars($_POST['Password']);
 
 		if (isset($_SESSION['loggedin']) == 1)
 		{
@@ -96,10 +95,10 @@ try
         <img src="pictures/logo.png">
         </div>
         <ul class="signup-nav">
-            <li><a href="index.php"> HOME </a></li>
+            <li><a href="signedin.php"> HOME </a></li>
             <li><a href="signup.php"> SIGNUP </a></li>
             <li class="active"><a href=""> LOGIN </a></li>
-            <li><a href="gallery.php"> GALLERY </a></li>
+			<li><a href="gallery.php"> GALLERY </a></li>
 
         </ul>
     </header>
