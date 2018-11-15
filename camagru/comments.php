@@ -19,6 +19,7 @@ print_r($_SESSION['Username']);
 			echo "! Username is invalid <br>";
 		}
 		else if (!isset($comment) || empty($comment))
+		
 		{
 			echo "! Comment is invalid <br>";
 		}
