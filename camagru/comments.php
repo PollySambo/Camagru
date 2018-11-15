@@ -13,6 +13,10 @@ print_r($_SESSION['Username']);
 		$image_user		= trim(htmlspecialchars($_POST['image_user']));
 		$image_id 		= trim(htmlspecialchars($_POST['image_id']));
 		$comment 		= htmlspecialchars($_POST['commet_txt']);
+	
+
+
+
 		
 		if (!isset($Username) || empty($Username))
 		{

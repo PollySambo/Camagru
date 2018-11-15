@@ -4,19 +4,17 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+
 require 'config/database.php';
 
-// echo $_SESSION['Username'];
-
-// var_dump($_SESSION['Username']);
-
-
-$Username = htmlspecialchars($_POST['Username']);
-$Password = htmlspecialchars($_POST['Password']);
-
-//var_dump((isset($_POST["submit"]);
 try
 	{
+		if (!empty($_POST['Username']) || !empty($_POST['Password']))
+		{
+			$Username = htmlspecialchars($_POST['Username']);
+			$Password = htmlspecialchars(isset($_POST['Password']));
+
+
 		if (isset($_SESSION['loggedin']) == 1)
 		{
 			die("You are already signed in!");
@@ -77,6 +75,7 @@ try
 		}
 		else 
 			die('Something went wrong...');
+	}
 	}
 	catch(PDOException $e)
 	{

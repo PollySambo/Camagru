@@ -1,24 +1,16 @@
 <?php
 session_start();
-//  ini_set('display_errors', 1);
-//  ini_set('display_startup_errors', 1);
-//  error_reporting(E_ALL);
+ ini_set('display_errors', 1);
+ ini_set('display_startup_errors', 1);
+ error_reporting(E_ALL);
 
 include 'config/database.php'; 
 require_once 'functions.php';
 //var_dump($servername);
-
-$fname;
-$lname;
-$username; 
-$email;
-$pwd;
-$re_pwd;
-$active;
-$notifi;
-$token;
-
-if (isset($_POST))
+//var_dump($fname, $lname, $username , $email, $pwd , $re_pwd, $active, $token);
+try {
+        //print_r($_POST);
+        if (!empty($_POST['fname'])  || !empty($_POST['lname']) || !empty($_POST['username']) || !empty($_POST['email']) || !empty($_POST['pwd']) || !empty($_POST['re_pwd']))
 {
     $fname          = trim(htmlspecialchars($_POST['fname']));
     $lname          = trim(htmlspecialchars($_POST['lname']));
@@ -29,10 +21,6 @@ if (isset($_POST))
     $active         = false;
     $notifi         = true;
     $token			= bin2hex(openssl_random_pseudo_bytes(16));
-}
-//var_dump($fname, $lname, $username , $email, $pwd , $re_pwd, $active, $token);
-try {
-        //print_r($_POST);
        
 		if (!isset($username) || empty($username) || strlen($username) < 4)
 		{
@@ -112,6 +100,7 @@ camagru Team";
             die('something went wrong');
                 $conn = null;
         }
+    }
         catch(PDOException $e)
         {
             echo $stmt . "<br>" . $e->getMessage();

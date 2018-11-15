@@ -1,9 +1,9 @@
 
 <?php
 // session_start();
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
 
 require './config/database.php';
 $con = new PDO("mysql:host=$DB_DSN;dbname=$DB_NAME", $DB_USER, $DB_PASSWORD);
@@ -35,7 +35,7 @@ while($result = $stmt->fetch(PDO::FETCH_ASSOC))
     $img[] = $result;
 }
 
-echo '<pre>'; print_r($img);echo '</pre>';
+// echo '<pre>'; print_r($img);echo '</pre>';
 
 ?>
 
@@ -53,15 +53,49 @@ echo '<pre>'; print_r($img);echo '</pre>';
 	<?php foreach ($img as $pic):?>
 		  <div class="pic">
                 <img src='images/<?=$pic['image'];?>' >
-                <a href="like.php?type=image&image_id=<?php echo $pic['image_id']; ?>">LIKE</a>
-                <p><?php echo $pic['likes']; ?> people liked this.</p>
+				<a href="like.php?type=image&image_id=<?php echo $pic['image_id']; ?>">LIKE</a>
+				<p><?php echo $pic['likes']; ?> people liked this.</p>
+				
                 <?php if(!empty($pic['liked_by'])): ?>
                 <ul>
                     <?php foreach($pic['liked_by'] as $_SESSION['Username']): ?>
                     <li><?php echo $_SESSION['Username'] ?></li>
                     <?php endforeach; ?>
                 </ul>
-                <?php endif; ?>
+				<?php endif; ?>
+				<form action="gallery_comments.php" id="commentform" method="GET">
+					<input type= "hidden" value="<?php echo $pic['image_id']; ?>" name="image_id">
+					<textarea type="text" name="commet_txt"></textarea>
+					<input type="submit">
+				</form>
+				<?php
+					$id = $pic['image_id'];
+					$stmt = $con->prepare("SELECT * FROM comments WHERE image_id=:image_id");
+					$stmt->bindValue(':image_id', $id);
+					$stmt->execute();
+					$comments = $stmt->fetchAll();
+					echo '<table><ul>';
+					for ($j=0; $j < sizeof($comments); $j++) 
+					{ 
+						$comment = $comments[$j]['comment'];
+						$comment_by = $comments[$j]['Username'];
+					echo'
+						<tr>
+							<td><li>'
+								. $comment_by . 
+								' - </li><td>'
+								. $comment . 
+								'</td>' .
+							'</td>
+						</tr>
+						';
+					}
+					echo '
+					</ul></table>
+					';
+				?>
+
+				
         </div>
     <?php endforeach; ?>
 
