@@ -87,7 +87,32 @@ try {
 
     // use exec() because no results are returned
     $conn->exec($sql);
-    echo "Table likes created successfully";
+    echo "Table likes created successfully<br>";
+    }
+catch(PDOException $e)
+    {
+    echo $sql . "<br>" . $e->getMessage();
+    }
+
+$conn = null;
+
+try {
+    $conn = new PDO("mysql:host=$DB_DSN;dbname=$DB_NAME", $DB_USER, $DB_PASSWORD);
+    // set the PDO error mode to exception
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // sql to create table
+    $sql = "CREATE TABLE IF NOT EXISTS comments (
+    `comment_id` INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
+    `Username` VARCHAR(255) NOT NULL,
+    `comment` TEXT NOT NULL,
+    `image_id` INT(255) NOT NULL,
+    `date_added` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL	
+       )";
+
+    // use exec() because no results are returned
+    $conn->exec($sql);
+    echo "Table comments created successfully";
     }
 catch(PDOException $e)
     {

@@ -1,5 +1,5 @@
-<?php
 
+<?php
 // session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -10,18 +10,20 @@ $con = new PDO("mysql:host=$DB_DSN;dbname=$DB_NAME", $DB_USER, $DB_PASSWORD);
 $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   
 
-$stmt = $con->prepare("SELECT
+$stmt = $con->query("
+                    SELECT
                     images.image_id,
                     images.image,
-                    COUNT(likes.image_id) AS likes
+                    COUNT(likes.like_id) AS likes,
+                    GROUP_CONCAT(users.Username SEPARATOR '|') AS liked_by
                     
                     FROM images
 
                     LEFT JOIN likes
-                    ON images.image_id = likes.image
+                    ON images.image_id = likes.image_id
 
                     LEFT JOIN users
-                    on likes.user = users.user_id
+                    ON likes.user = users.Username
 
                     GROUP BY images.image_id
                     ");
@@ -29,6 +31,7 @@ $stmt->execute();
     
 while($result = $stmt->fetch(PDO::FETCH_ASSOC))
 {
+    $result['liked_by'] = $result['liked_by'] ? explode('|', $result['liked_by'] ) : [];
     $img[] = $result;
 }
 
@@ -51,11 +54,16 @@ echo '<pre>'; print_r($img);echo '</pre>';
 		  <div class="pic">
                 <img src='images/<?=$pic['image'];?>' >
                 <a href="like.php?type=image&image_id=<?php echo $pic['image_id']; ?>">LIKE</a>
-                <p>likes</p>
+                <p><?php echo $pic['likes']; ?> people liked this.</p>
+                <?php if(!empty($pic['liked_by'])): ?>
                 <ul>
-                    <li></li>
+                    <?php foreach($pic['liked_by'] as $_SESSION['Username']): ?>
+                    <li><?php echo $_SESSION['Username'] ?></li>
+                    <?php endforeach; ?>
                 </ul>
-		</div>
-	<?php endforeach;?>
+                <?php endif; ?>
+        </div>
+    <?php endforeach; ?>
+
 </body>
 </html>

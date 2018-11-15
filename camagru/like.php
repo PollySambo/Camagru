@@ -14,31 +14,30 @@ if (isset($_GET['type'], $_GET['image_id']))
 {
 
     $type   = $_GET['type'];
-    $id     = (int)$_GET['image_id'];
+    $id     = $_GET['image_id'];
 
     switch($type){
-        case 'image';
+        case 'image':
         $con = new PDO("mysql:host=$DB_DSN;dbname=$DB_NAME", $DB_USER, $DB_PASSWORD);
             // set the PDO error mode to exception
           $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-          $stmt = $con->prepare("INSERT INTO likes (user, image_id)
-                                SELECT {$SESSION['user_id']}, {$id}
+          $stmt = $con->query("INSERT INTO likes (user, image_id)
+                                SELECT '".$_SESSION['Username']."', '".$id."'
                                 FROM images
                                 WHERE EXISTS (
                                     SELECT image_id
                                     FROM images
-                                WHERE image_id = {$id})
+                                WHERE image_id = '".$id."')
                                 AND NOT EXISTS (
                                     SELECT image_id
                                     FROM likes
-                                    WHERE user = {$SESSION['user_id']}
-                                    AND images = {$id})
+                                    WHERE user = '".$_SESSION['Username']."'
+                                    AND image_id = '".$id."')
                                     LIMIT 1
                                     ");
-    
         break;
     }
 }
 
-// header('location: gallery.php');
+header('location:pizza.php');
 ?>
